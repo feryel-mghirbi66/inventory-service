@@ -2,6 +2,7 @@ package com.kubeflux.inventoryservice.controller;
 
 import com.kubeflux.inventoryservice.model.Stock;
 import com.kubeflux.inventoryservice.repository.StockRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -21,12 +22,17 @@ public class StockController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('STOCK_MANAGER')")
     public Stock addOrUpdateStock(@RequestBody Stock stock) {
         return stockRepository.save(stock);
     }
 
-    @DeleteMapping("/{productId}")
-    public void deleteStock(@PathVariable String productId) {
-        stockRepository.deleteById(productId);
+    @PutMapping("/{productId}")
+    @PreAuthorize("hasAuthority('STOCK_MANAGER')")
+    public Stock updateQuantity(@PathVariable String productId, @RequestBody Stock stock) {
+        Stock existing = stockRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Produit introuvable"));
+        existing.setQuantityAvailable(stock.getQuantityAvailable());
+        return stockRepository.save(existing);
     }
 }
