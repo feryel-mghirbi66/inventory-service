@@ -35,4 +35,8 @@ public class StockController {
         existing.setQuantityAvailable(stock.getQuantityAvailable());
         return stockRepository.save(existing);
     }
+    @DeleteMapping("/{productId}")
+    public void deleteStock(@PathVariable String productId) {
+        stockRepository.deleteById(productId);
+    }
 }
